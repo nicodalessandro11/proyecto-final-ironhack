@@ -1,75 +1,87 @@
 <template>
-  <div class="wrapper container mt-5">
-    <h3 class="header-title">ToDo App Sign-up</h3>
+  <div class="container mt-5">
 
-    <!-- Form for sign in -->
-    <form @submit.prevent="signIn" class="form-sign-in">
-      <div class="form">
-        <!-- Email input field -->
-        <div class="form-input">
-          <label class="input-field-label" for="email">E-mail</label>
-          <input type="email" class="input-field" placeholder="example@gmail.com" id="email" v-model="email" required />
+    <div class="header text-center">
+      <div class="header-description">
+        <h3 class="header-title">Register to ToDo App</h3>
+        <p class="header-subtitle">Start organizing your tasks!</p>
+      </div>
+    </div>
+
+    <form @submit.prevent="signUp" class="form-sign-in mx-auto w-50">
+      <div class="form mb-3">
+        <div class="form-input mb-3">
+          <label class="input-field-label">E-mail</label>
+          <input type="email" class="form-control" placeholder="example@gmail.com" id="email" v-model="email" required />
         </div>
-
-        <!-- Password input field -->
-        <div class="form-input">
-          <label class="input-field-label" for="password">Password</label>
-          <input type="password" class="input-field" placeholder="**********" id="password" v-model="password" required />
+        <div class="form-input mb-3">
+          <label class="input-field-label">Password</label>
+          <input type="password" class="form-control" placeholder="**********" id="password" v-model="password"
+            required />
         </div>
-
-        <!-- Submit button -->
-        <button class="button" type="submit">Sign In</button>
+        <div class="form-input mb-3">
+          <label class="input-field-label">Confirm password</label>
+          <input type="password" class="form-control" placeholder="**********" id="confirmPassword"
+            v-model="confirmPassword" required />
+        </div>
+        <button class="btn btn-primary btn-lg" type="submit">Sign Up</button>
+        <p class="mt-3">
+          Have an account?
+          <PersonalRouter :route="route" :buttonText="buttonText" class="sign-up-link" />
+        </p>
       </div>
     </form>
 
-    <!-- Sign up link -->
-    <p>Don't have an account?
-      <PersonalRouter :route="route" :buttonText="buttonText" class="sign-up-link" />
-    </p>
+    <div v-show="errorMsg" class="alert alert-danger mt-4" role="alert">{{ errorMsg }}</div>
   </div>
 </template>
 
 <script setup>
-// Import necessary modules and components
-import PersonalRouter from "./PersonalRouter.vue";
+// Importing necessary modules and components from vue, vue-router, and your application
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "../stores/user";
-import { ref } from "vue";
+import PersonalRouter from "./PersonalRouter.vue";
+import { supabase } from "../supabase";
 
-// Define the route and button text for sign up link
-const route = "/auth/signup";
-const buttonText = "Sign Up";
-
-// Initialize reactive variables for form inputs
+// Initializing references for form input fields and error message
 const email = ref("");
 const password = ref("");
+const confirmPassword = ref("");
+const errorMsg = ref("");
 
-// Initialize Vue router for redirects
+// Initializing route information
+const route = "/auth/login";
+const buttonText = "Sign In";
+
+// Getting router instance to perform navigation tasks
 const redirect = useRouter();
 
-// Define the sign in function
-const signIn = async () => {
-  try {
-    // Attempt to sign in with entered credentials
-    await useUserStore().signIn(email.value, password.value);
-
-    // If successful, redirect to home page
-    redirect.push({ path: "/" });
-
-  } catch (error) {
-    // If unsuccessful, alert with the error
-    alert(error);
+// Function to handle user sign up
+const signUp = async () => {
+  // Check if password and confirmation password are the same
+  if (password.value === confirmPassword.value) {
+    try {
+      // Calls the user store and sends the user's info to the backend to sign up
+      await useUserStore().signUp(email.value, password.value);
+      // On successful sign up, redirects user to the login view
+      redirect.push({ path: "/auth/login" });
+    } catch (error) {
+      // If there's an error during sign up, displays the error message
+      errorMsg.value = error.message;
+      // After 5 seconds, hides the error message
+      setTimeout(() => {
+        errorMsg.value = null;
+      }, 5000);
+    }
+  } else {
+    // If the password and confirmation password do not match, sets the error message
+    errorMsg.value = "Passwords do not match.";
   }
 };
 </script>
 
-<!-- Style section -->
 <style scoped>
-.wrapper {
-  max-width: 800px;
-  margin: auto;
-}
-
 .container {
   max-width: 600px;
   margin: auto;
@@ -80,43 +92,28 @@ const signIn = async () => {
 }
 
 .header-title {
-  color: #333;
+  font-size: 2.5em;
+  color: #3c3c3c;
+  margin-bottom: 0.5em;
+}
+
+.header-subtitle {
+  font-size: 1.3em;
+  color: #6c757d;
+}
+
+.input-field-label {
+  font-weight: bold;
+  color: #495057;
+}
+
+.alert-danger {
   text-align: center;
-  margin-bottom: 1em;
 }
 
-.form-input {
-  margin-bottom: 1em;
-}
-
-.input-field {
+.btn-primary {
   width: 100%;
-  padding: 0.5em;
-  font-size: 1em;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-.button {
-  width: 100%;
-  padding: 0.5em;
-  background-color: #00688d;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.button:hover {
-  background-color: #00506b;
-}
-
-.sign-up-link {
-  color: #00688d;
-}
-
-.sign-up-link:hover {
-  text-decoration: underline;
 }
 </style>
+
+

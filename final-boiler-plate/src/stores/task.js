@@ -3,44 +3,46 @@ import { defineStore } from "pinia";
 import { supabase } from "../supabase";
 import { useUserStore } from "./user";
 
+// Define the tasks store
 export const useTaskStore = defineStore("tasks", () => {
-  // Esta tienda utiliza el Composition API
+  // A ref to store the tasks
   const tasksArr = ref([]);
-  
-  // conesguir tareas de supabase
+
+  // Function to fetch the tasks
   const fetchTasks = async () => {
     const { data: tasks } = await supabase
-      .from("tasks")
-      .select("*")
-      .order("id", { ascending: false });
-    tasksArr.value = tasks;
-    // console.log(tasksArr.value);
+      .from("tasks") // Access the tasks table
+      .select("*") // Select all fields
+      .order("id", { ascending: false }); // Order by id in descending order
+    tasksArr.value = tasks; // Assign the fetched tasks to tasksArr
   };
 
-  // añadir tareas de supabase
+  // Function to add a task
   const addTask = async (title, description) => {
-    console.log(useUserStore().user.id);
+    // Insert a new task into the tasks table
     const { data, error } = await supabase.from("tasks").insert([
       {
-        user_id: useUserStore().user.id,
+        user_id: useUserStore().user.id, // The id of the current user
         title: title,
         is_complete: false,
         description: description,
       },
     ]);
-    await fetchTasks();
+    await fetchTasks(); // Refresh the tasks after adding
   };
 
-  // borrar tareas de supabase
+  // Function to delete a task
   const deleteTask = async (id) => {
+    // Delete a task from the tasks table that matches the id
     const { data, error } = await supabase.from("tasks").delete().match({
       id: id,
     });
-    await fetchTasks();
+    await fetchTasks(); // Refresh the tasks after deleting
   };
 
-  // actualizar tareas de supabase
+  // Function to update a task
   const updateTask = async (id, title, description) => {
+    // Update a task in the tasks table that matches the id
     const { data, error } = await supabase
       .from("tasks")
       .update([
@@ -50,22 +52,31 @@ export const useTaskStore = defineStore("tasks", () => {
         },
       ])
       .eq("id", id);
-      await fetchTasks();
+    await fetchTasks(); // Refresh the tasks after updating
   };
 
-    // actualizar tareas de supabase
-    const completeTask = async (id, booleanValue) => {
-      const { data, error } = await supabase
-        .from('tasks')
-        .update({ is_complete: booleanValue })
-        .eq('id', id);
-    
-      if (error) {
-        console.error(error);
-        return;
-      }
-        await fetchTasks();
-    };
+  // Function to mark a task as complete
+  const completeTask = async (id, booleanValue) => {
+    // Update a task's is_complete field in the tasks table that matches the id
+    const { data, error } = await supabase
+      .from("tasks")
+      .update({ is_complete: booleanValue })
+      .eq("id", id);
 
-  return { tasksArr, fetchTasks, addTask, deleteTask, updateTask, completeTask };
+    if (error) {
+      console.error(error);
+      return;
+    }
+    await fetchTasks(); // Refresh the tasks after updating
+  };
+
+  // Return the public API for the tasks store
+  return {
+    tasksArr,
+    fetchTasks,
+    addTask,
+    deleteTask,
+    updateTask,
+    completeTask,
+  };
 });

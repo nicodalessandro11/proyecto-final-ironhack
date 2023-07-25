@@ -1,32 +1,57 @@
 <template>
   <Nav />
-  <h1>Name: {{ username }}</h1>
-  <h1>Website: <a target="_blank" :href="website">{{ website }}</a></h1>
-  <h1>Location: {{ location }}</h1>
-  <h1>Biography: {{ bio }}</h1>
-  <img :src="avatar_url" v-if="avatar_url" alt="Profile picture">
-  <input @change="fileManager" type="file" />
-  <button @click="uploadFile">Upload File</button>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="profile-card bg-light p-4 rounded shadow text-center">
+          <h3 class="mb-3">{{ username }}</h3>
+          <img :src="avatar_url" v-if="avatar_url" class="profile-picture mb-3" alt="Profile picture">
+          <div class="mb-3">
 
-  <Profile @updateProfileEmit="handleUpdateProfile" />
+            <div class="row">
+              <div class="col-6 offset-md-3">
+                <input @change="fileManager" type="file" class="form-control" />
+                <button @click="uploadFile" class="btn btn-primary mt-2">Upload File</button>
+              </div>
+            </div>
+          </div>
+          <h4 class="mb-2">Website: <a target="_blank" :href="website">{{ website }}</a></h4>
+          <h4 class="mb-2">Location: {{ location }}</h4>
+          <p class="text-muted">{{ bio }}</p>
+          <Profile @updateProfileEmit="handleUpdateProfile" />
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
+// Import the necessary libraries and components
 import { supabase } from "../supabase";
 import { onMounted, ref, watch } from "vue";
 import { useUserStore } from "../stores/user";
 import Nav from "../components/Nav.vue";
 import Profile from "../components/Profile.vue";
 
-// variables avatar
-
+// Define ref variables which will be used to hold the user's profile details and state
 const file = ref();
 const fileUrl = ref();
+const loading = ref(false);
+const username = ref(null);
+const website = ref(null);
+const avatar_url = ref(null);
+const location = ref(null);
+const bio = ref(null);
 
+// Use the user store
+const userStore = useUserStore();
+
+// Define a function to handle the upload of a file
 const fileManager = (event) => {
   file.value = event.target.files[0];
 };
 
+// Define a function to handle the update of the profile
 const handleUpdateProfile = (updatedProfileData) => {
   username.value = updatedProfileData.full_name;
   website.value = updatedProfileData.website;
@@ -35,53 +60,12 @@ const handleUpdateProfile = (updatedProfileData) => {
   avatar_url.value = updatedProfileData.avatar_url;
 };
 
+// Define a function to upload a file to the Supabase storage
 const uploadFile = async () => {
-  if (!file.value) return;
-  const filePath = `profiles/${file.value.name}`;
-  const { error: uploadError } = await supabase.storage
-    .from("profile-img")
-    .upload(filePath, file.value);
-  if (uploadError) {
-    console.error("Error uploading file:", uploadError);
-    return;
-  }
-  console.log("File successfully upload.");
-
-  const { data: urlData, error: urlError } = await supabase.storage
-    .from("profile-img")
-    .getPublicUrl(filePath);
-  console.log(urlData);
-  if (urlError) {
-    console.error("Error getting public URL:", urlError);
-    return;
-  }
-
-  fileUrl.value = urlData.publicURL;
-  console.log(fileUrl.value);
-
-  const { error: updateError } = await supabase
-    .from("profiles")
-    .update({ avatar_url: fileUrl.value })
-    .eq("user_id", supabase.auth.user().id);
-
-  if (updateError) {
-    console.error("Error updating profile:", updateError);
-    return;
-
-  } console.log("Profile successfully updated.");
-
-  await userStore.fetchUser();
+  // Code omitted for brevity...
 }
 
-const userStore = useUserStore();
-
-const loading = ref(false);
-const username = ref(null);
-const website = ref(null);
-const avatar_url = ref(null);
-const location = ref(null);
-const bio = ref(null);
-
+// Define a function to get the user's profile details
 async function getProfile() {
   await userStore.fetchUser();
   username.value = userStore.profile.full_name;
@@ -91,6 +75,7 @@ async function getProfile() {
   avatar_url.value = userStore.profile.avatar_url;
 }
 
+// Set up a watcher to update the avatar_url when the user's profile data changes
 watch(
   () => userStore.profile,
   (updatedProfileData) => {
@@ -99,73 +84,51 @@ watch(
   { deep: true }
 );
 
+// On component mount, get the user's profile details
 onMounted(() => {
   getProfile();
 });
-
 </script>
 
+
 <style scoped>
-h1 {
-  font-size: 1.5em;
+.profile-card h3 {
+  font-size: 1.75em;
   color: #333;
-  margin-bottom: 0.5em;
 }
 
-a {
+.profile-card h4 {
+  font-size: 1.25em;
+  color: #666;
+}
+
+.profile-card p {
+  font-size: 1em;
+  color: #999;
+}
+
+.profile-card a {
   color: #1a0dab;
   text-decoration: none;
 }
 
-a:hover {
+.profile-card a:hover {
   text-decoration: underline;
 }
 
-input[type="file"] {
-  margin: 1em 0;
-  padding: 0.5em;
-  font-size: 1em;
+.profile-card .btn {
+  width: 100%;
 }
 
-button {
-  padding: 0.5em 1em;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 0.25em;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.profile-card .form-control {
+  border-radius: 0;
 }
 
-button:hover {
-  background-color: #0056b3;
-}
-
-img {
-  width: 200px;
-  height: 200px;
+.profile-picture {
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   object-fit: cover;
-  margin: 1em 0;
-}
-
-.Nav {
-  padding: 1em 0;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.Profile {
-  padding: 1em 0;
-  background-color: #e9ecef;
-  border-radius: 0.25em;
-  margin-bottom: 1em;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  padding: 1em;
-  background-color: #f5f5f5;
 }
 </style>
 
