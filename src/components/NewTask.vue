@@ -1,3 +1,22 @@
+<template>
+    <div class="container mt-4 palette-200 pt-5 pb-5 ps-5 pe-5 rounded-4">
+        <h6 class="mb-3">ToDo App - Start organizing your tasks!</h6>
+        <h1 class="mb-3 text-thin">Add a new Task</h1>
+        <div v-if="showErrorMessage" class="alert alert-danger" role="alert">
+            {{ errorMessage }}
+        </div>
+        <div>
+            <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Add a Task Title" v-model="name">
+            </div>
+            <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Add a Task Description" v-model="description">
+            </div>
+            <button @click="addTask" class="btn btn-secondary btn-second">Add</button>
+        </div>
+    </div>
+</template>
+
 <script setup>
 import { ref } from "vue";
 import { useTaskStore } from "../stores/task";
@@ -35,25 +54,6 @@ const addTask = () => {
     }
 };
 </script>
-
-
-<template>
-    <div class="container mt-4">
-        <h1 class="mb-3">Add a new Task</h1>
-        <div v-if="showErrorMessage" class="alert alert-danger" role="alert">
-            {{ errorMessage }}
-        </div>
-        <div>
-            <div class="mb-3">
-                <input type="text" class="form-control" placeholder="Add a Task Title" v-model="name">
-            </div>
-            <div class="mb-3">
-                <input type="text" class="form-control" placeholder="Add a Task Description" v-model="description">
-            </div>
-            <button @click="addTask" class="btn btn-primary">Add</button>
-        </div>
-    </div>
-</template>
 
 <style scoped>
 .container {

@@ -3,7 +3,7 @@
   <Nav />
 
   <!-- Include the NewTask component -->
-  <div class="bg-container pt-5 pb-5">
+  <div class="bg-container palette-0 pt-5 pb-5">
     <NewTask />
   </div>
   <div class="wrapper container mt-4">
@@ -44,10 +44,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.bg-container {
-  background-color: #6dcdff;
-}
-
 .wrapper {
   max-width: 800px;
   margin: auto;

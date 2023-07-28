@@ -28,7 +28,7 @@
 import { ref, defineProps } from "vue";
 
 // Import the useTaskStore function from "../stores/task" to access the task store
-import { useTaskStore } from "../stores/task";
+import { useTaskStore } from "../stores/task.js";
 
 
 // Initialize the taskStore using the useTaskStore function
@@ -74,7 +74,8 @@ const toggleComplete = () => {
 <style scoped>
 .card {
   margin: 1rem 0;
-  background-color: rgb(247, 246, 248);
+  background-color: #F7F6F8;
+  border-color: #CCD5DE;
 }
 
 .button-group {
