@@ -1,9 +1,15 @@
+@import "typeface-raleway";
+
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: "Raleway", sans-serif;
 }
 
 .text-thin {
-  font-weight: 50;
+  font-weight: 300;
+}
+
+.text-thinner {
+  font-weight: 100;
 }
 
 .btn-second {
@@ -13,7 +19,7 @@ body {
 }
 
 .palette-0 {
-  background-color:#F7F6F8;
+  background-color: #f7f6f8;
 }
 
 .palette-50 {
@@ -29,11 +35,11 @@ body {
 }
 
 .palette-300 {
-  background-color: #00a8e1;
+  color: rgb(192, 178, 131);
 }
 
 .palette-400 {
-  background-color: #0085b3;
+  background-color: rgb(192, 178, 131);
 }
 
 .palette-500 {
@@ -46,8 +52,4 @@ body {
 
 .palette-700 {
   background-color: #003c52;
-}
-
-.palette-700 {
-  background-color: #002a3c;
 }

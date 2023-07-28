@@ -1,6 +1,13 @@
 <template>
+    <div class="date-banner mb-3 text-center">
+        <span class="badge badge-secondary">
+            <i class="fas fa-calendar-day"></i>
+            Today is {{ todayDate }}
+        </span>
+    </div>
+
     <div class="container mt-4 palette-200 pt-5 pb-5 ps-5 pe-5 rounded-4">
-        <h6 class="mb-3">ToDo App - Start organizing your tasks!</h6>
+        <h6 class="mb-3">Start organizing your tasks!</h6>
         <h1 class="mb-3 text-thin">Add a new Task</h1>
         <div v-if="showErrorMessage" class="alert alert-danger" role="alert">
             {{ errorMessage }}
@@ -32,6 +39,10 @@ const description = ref('');
 const showErrorMessage = ref(false);
 const errorMessage = ref(null);
 
+// Create a reactive variable to display today's date
+const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+const todayDate = ref(new Intl.DateTimeFormat('en-US', options).format(new Date()));
+
 // Function to add a task
 const addTask = () => {
     // Check if name or description is empty
@@ -58,7 +69,24 @@ const addTask = () => {
 <style scoped>
 .container {
     max-width: 600px;
+    background-color: #222222;
+    color: white;
+}
+
+.date-banner {
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.date-banner .badge {
+    background-color: #222222;
+    color: #f8f9fa;
+    padding: 15px 25px;
+    border-radius: 20px;
+    font-size: 17px;
+}
+
+.date-banner .badge i {
+    margin-right: 10px;
 }
 </style>
-
-  
